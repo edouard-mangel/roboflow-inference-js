@@ -28,6 +28,23 @@ var color_choices = [
 ];
 
 var available_models = {
+  "uno-card-bot": {
+    name: "Uno",
+    version: 27,
+    confidence: 0.3,
+    video:
+      "https://media.roboflow.com/homepage/Worksite_Safety/Screen_Recording_2023-02-15_at_11.09.23_AM.mov?ik-sdk-version=javascript-1.4.3&updatedAt=1676479657201",
+    imageGrid: [
+      "https://media.roboflow.com/homepage/Worksite_Safety/Screenshot_2023-02-15_at_11.07.02_AM_Large.jpeg?ik-sdk-version=javascript-1.4.3&updatedAt=1676480555712",
+
+      "https://media.roboflow.com/homepage/Worksite_Safety/Screenshot_2023-02-15_at_11.06.04_AM_Large.jpeg?ik-sdk-version=javascript-1.4.3&updatedAt=1676480555618",
+
+      "https://media.roboflow.com/homepage/Worksite_Safety/001548_jpg.rf.01a671015cc2ceefdbaf0801b4913d12.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676479636902",
+
+      "https://media.roboflow.com/homepage/Worksite_Safety/image_818_jpg.rf.d804cf6e52c8a47cf294d98c587594d1.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676479636223",
+    ],
+    model: null,
+  },
   "microsoft-coco": {
     name: "Microsoft COCO",
     version: 9,
@@ -44,23 +61,7 @@ var available_models = {
     ],
     model: null,
   },
-  "construction-site-safety": {
-    name: "Worksite Safety",
-    version: 27,
-    confidence: 0.3,
-    video:
-      "https://media.roboflow.com/homepage/Worksite_Safety/Screen_Recording_2023-02-15_at_11.09.23_AM.mov?ik-sdk-version=javascript-1.4.3&updatedAt=1676479657201",
-    imageGrid: [
-      "https://media.roboflow.com/homepage/Worksite_Safety/Screenshot_2023-02-15_at_11.07.02_AM_Large.jpeg?ik-sdk-version=javascript-1.4.3&updatedAt=1676480555712",
-
-      "https://media.roboflow.com/homepage/Worksite_Safety/Screenshot_2023-02-15_at_11.06.04_AM_Large.jpeg?ik-sdk-version=javascript-1.4.3&updatedAt=1676480555618",
-
-      "https://media.roboflow.com/homepage/Worksite_Safety/001548_jpg.rf.01a671015cc2ceefdbaf0801b4913d12.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676479636902",
-
-      "https://media.roboflow.com/homepage/Worksite_Safety/image_818_jpg.rf.d804cf6e52c8a47cf294d98c587594d1.jpg?ik-sdk-version=javascript-1.4.3&updatedAt=1676479636223",
-    ],
-    model: null,
-  },
+  
   "containers-detection-db0c2": {
     name: "Logistics",
     version: 1,
@@ -107,8 +108,7 @@ for (var item in available_models) {
   model_select.add(option);
 }
 
-
-var current_model_name = "microsoft-coco";
+var current_model_name = "uno-card-bot";
 var current_model_version = 9;
 const API_KEY = "rf_U7AD2Mxh39N7jQ3B6cP8xAyufLH3";
 const DETECT_API_KEY = "4l5zOVomQmkAqlTJPVKN";
@@ -155,6 +155,7 @@ function detectFrame() {
         requestAnimationFrame(detectFrame);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBbox(ctx, video, predictions);
+        document.getElementById("Annonces").innerText = predictions;
       });
   } else {
     main_stream.getTracks().forEach(function (track) {
@@ -164,16 +165,6 @@ function detectFrame() {
   }
 }
 
-// when user scrolls past #model-select, stop webcam
-window.addEventListener("scroll", function () {
-  if (window.scrollY > 100) {
-    webcamLoop = false;
-  }
-  // if comes back up, start webcam
-  if (window.scrollY < 100) {
-    webcamLoop = true;
-  }
-});
 
 async function apiRequest(image) {
   var version = available_models[current_model_name]["version"];
@@ -225,25 +216,6 @@ async function getModel() {
 //     },
 //     false
 // );
-
-document
-  .getElementById("webcam-predict")
-  .addEventListener("click", function () {
-    document.getElementById("example_demo").style.display = "none";
-    // if video1, show it
-    if (document.getElementById("video1")) {
-      document.getElementById("video1").style.display = "none";
-    } else if (
-      document.getElementById("video1") &&
-      document.getElementById("video1").style.display == "block"
-    ) {
-      return;
-    }
-    // show picture canvas
-    document.getElementById("picture_canvas").style.display = "block";
-    document.getElementById("mobile-picture").style.display = "none";
-    webcamInference();
-  });
 
 var bounding_box_colors = {};
 
@@ -430,7 +402,7 @@ function drawBoundingBoxes(
 
 function webcamInference() {
   // show loading_picture
-  document.getElementById("loading_picture").style.display = "block";
+  //document.getElementById("loading_picture").style.display = "block";
   changeElementState([
     "video",
     "video_canvas",
@@ -631,106 +603,6 @@ function imageInference(e) {
   };
 }
 
-function processDrop(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  // hide #picture
-  changeElementState(
-    ["picture", "example_demo", "video_canvas", "picture_canvas"],
-    "none"
-  );
-  // document.getElementById("picture_canvas").style.display = "block";
-  // show loading image
-  if (document.getElementById("loading_picture")) {
-    document.getElementById("loading_picture").style.display = "block";
-  }
-
-  // clear canvas if necessary
-  if (document.getElementById("picture_canvas").getContext) {
-    var canvas = document.getElementById("picture_canvas");
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
-
-  var canvas = document.getElementById("picture_canvas");
-  var ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  var file = e.dataTransfer.files[0];
-  var reader = new FileReader();
-
-  reader.readAsDataURL(file);
-
-  // only allow png, jpeg, jpg
-  if (
-    file.type == "image/png" ||
-    file.type == "image/jpeg" ||
-    file.type == "image/jpg"
-  ) {
-    reader.onload = function (event) {
-      var img = new Image();
-      img.src = event.target.result;
-      img.crossOrigin = "anonymous";
-      img.onload = function () {
-        var [sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight, scalingRatio] =
-          getCoordinates(img);
-
-        // send to api
-        var base64 = getBase64Image(
-          img,
-          sx,
-          sy,
-          sWidth,
-          sHeight,
-          dx,
-          dy,
-          dWidth,
-          dHeight
-        );
-
-        apiRequest(base64).then(function (predictions) {
-          if (document.getElementById("loading_picture")) {
-            document.getElementById("loading_picture").style.display = "none";
-          }
-          document.getElementById("picture_canvas").style.display = "block";
-          ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
-          var predictions = predictions.map(function (prediction) {
-            return {
-              bbox: {
-                x: prediction.x,
-                y: prediction.y,
-                width: prediction.width,
-                height: prediction.height,
-              },
-              class: prediction.class,
-              confidence: prediction.confidence,
-            };
-          });
-          ctx.beginPath();
-          drawBoundingBoxes(
-            predictions,
-            canvas,
-            ctx,
-            scalingRatio,
-            sx,
-            sy,
-            true
-          );
-        });
-      };
-      document
-        .getElementById("picture_canvas")
-        .addEventListener("dragover", function (e) {
-          e.preventDefault();
-          e.stopPropagation();
-        });
-      document
-        .getElementById("picture_canvas")
-        .addEventListener("drop", processDrop);
-    };
-  }
-}
-
 function changeElementState(elements, state = "none") {
   for (var i = 0; i < elements.length; i++) {
     if (document.getElementById(elements[i])) {
@@ -739,23 +611,7 @@ function changeElementState(elements, state = "none") {
   }
 }
 
-// click on image-predict, show image inference
-document.getElementById("image-predict").addEventListener("click", function () {
-  // show prechosen_images_parent
-  var to_hide = [
-    "picture_canvas",
-    "example_demo",
-    "video",
-    "video_canvas",
-    "video1",
-    "mobile-picture",
-  ];
-  changeElementState(to_hide);
-  changeElementState(["prechosen_images_parent", "picture"], "block");
-  // set event handler on image
-  document.getElementById("picture").addEventListener("dragover", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  });
-  document.getElementById("picture").addEventListener("drop", processDrop);
+// Activate webcam on page load
+window.addEventListener("DOMContentLoaded", function () {
+  webcamInference();
 });
