@@ -107,17 +107,6 @@ for (var item in available_models) {
   model_select.add(option);
 }
 
-document.getElementById("mobile-predict").onclick = () => {
-  if (document.getElementById("video1")) {
-    document.getElementById("video1").style.display = "none";
-    // hide video_canvas
-    document.getElementById("video_canvas").style.display = "none";
-  }
-  document.getElementById("picture_canvas").style.display = "none";
-  document.getElementById("example_demo").style.display = "none";
-  document.getElementById("picture").style.display = "none";
-  document.getElementById("mobile-picture").style.display = "block";
-};
 
 var current_model_name = "microsoft-coco";
 var current_model_version = 9;
@@ -291,7 +280,7 @@ function switchModel() {
 
   // hide webcam button if model is not microsoft-coco
 
-  document.getElementById("webcam-predict").style.display = "inline";
+  //document.getElementById("webcam-predict").style.display = "inline";
 
   // change video to use new one
   // var video = document.getElementById("video_source");
@@ -443,10 +432,6 @@ function webcamInference() {
   // show loading_picture
   document.getElementById("loading_picture").style.display = "block";
   changeElementState([
-    "picture_canvas",
-    "prechosen_images_parent",
-    "picture",
-    "video1",
     "video",
     "video_canvas",
   ]);

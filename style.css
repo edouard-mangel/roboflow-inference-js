@@ -36,7 +36,7 @@ h1 {
 }
 #picture_canvas,
 #video_canvas {
-  display: none;
+  display: block;
 }
 #prechosen_images_parent {
   display: none;
